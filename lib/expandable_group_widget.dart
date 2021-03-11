@@ -26,27 +26,30 @@ class ExpandableGroup extends StatefulWidget {
   /// optional widget for expanded Icon.
   ///
   /// Default value is `Icon(Icons.keyboard_arrow_down)`
-  final Widget expandedIcon;
+  final Widget? expandedIcon;
 
   /// optional widget for collapse Icon.
   ///
   /// Default value is `Icon(Icons.keyboard_arrow_right)`
-  final Widget collapsedIcon;
+  final Widget? collapsedIcon;
 
   /// option value for header EdgeInsets
   ///
   /// Default value will `EdgeInsets.only(left: 0.0, right: 16.0)`
-  final EdgeInsets headerEdgeInsets;
+  final EdgeInsets? headerEdgeInsets;
 
   /// background color of header
   ///
   /// Default value `Theme.of(context).appBarTheme.color`
-  final Color headerBackgroundColor;
+  final Color? headerBackgroundColor;
 
-  ExpandableGroup({Key key,
+  final Color? dividerColor;
+
+  ExpandableGroup({Key? key,
     this.isExpanded = false,
-    @required this.header,
-    @required this.items,
+    required this.header,
+    required this.items,
+    this.dividerColor,
     this.expandedIcon,
     this.collapsedIcon,
     this.headerEdgeInsets,
@@ -58,7 +61,7 @@ class ExpandableGroup extends StatefulWidget {
 }
 
 class _ExpandableGroupState extends State<ExpandableGroup> {
-  bool _isExpanded;
+  late bool _isExpanded;
 
   @override
   void initState() {
@@ -76,13 +79,12 @@ class _ExpandableGroupState extends State<ExpandableGroup> {
 
   Widget _wrapHeader() {
     List<Widget> children = [];
-    if (!widget.isExpanded) {
-      children.add(Divider());
-    }
     children.add(ListTile(
       contentPadding: widget.headerEdgeInsets != null
           ? widget.headerEdgeInsets
           : EdgeInsets.only(left: 0.0, right: 16.0),
+      dense: true,
+      visualDensity: VisualDensity(horizontal: 0, vertical: -2),
       title: widget.header,
       trailing: _isExpanded
           ? widget.expandedIcon ?? Icon(Icons.keyboard_arrow_down)
@@ -100,9 +102,10 @@ class _ExpandableGroupState extends State<ExpandableGroup> {
   Widget _buildListItems(BuildContext context) {
     List<Widget> titles = [];
     titles.add(_wrapHeader());
-    titles.addAll(widget.items);
+    titles.add(Divider(color: widget.dividerColor, thickness: 1, height: 1),);
+    titles.addAll(ListTile.divideTiles(tiles: widget.items, context: context).toList());
     return Column(
-      children: ListTile.divideTiles(tiles: titles, context: context).toList(),
+      children: titles
     );
   }
 }
